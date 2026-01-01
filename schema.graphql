@@ -1,0 +1,850 @@
+##################################################
+# USDFC v0 - Enhanced Universal Schema
+# Combines V5 capabilities + Blockscout ecosystem data
+# Superior API design for maximum composability
+##################################################
+
+##################################################
+# UNIVERSAL FOUNDATION - Core Transaction System
+##################################################
+
+"""
+Universal Transaction - Every USDFC interaction in the ecosystem
+Combines V5 protocol events + Blockscout ecosystem data in single entity
+"""
+type Transaction @entity(immutable: true) {
+  # Universal identifiers
+  id: Bytes!                          # Unique transaction ID
+  hash: Bytes!                        # Transaction hash
+  blockNumber: BigInt!                # Block number
+  blockTimestamp: BigInt!             # Block timestamp
+  logIndex: BigInt                    # Log index (if event)
+  
+  # Universal parties
+  from: Account!                      # From account
+  to: Account!                        # To account
+  value: BigInt!                      # Value transferred (USDFC)
+  
+  # Data source classification
+  source: TransactionSource!          # How discovered
+  category: TransactionCategory!      # What type of operation
+  ecosystem: EcosystemType!           # Which ecosystem
+  
+  # Rich context
+  protocolContext: ProtocolContext    # V5-style protocol data
+  ecosystemContext: EcosystemContext  # Blockscout ecosystem data
+  
+  # Composability & analytics
+  composabilityScore: BigDecimal!     # Cross-protocol activity score
+  innovationScore: BigDecimal!        # Innovation/complexity score
+  riskScore: BigDecimal!              # Risk assessment score
+  
+  # Transaction metadata
+  gasUsed: BigInt                     # Gas consumed
+  gasPrice: BigInt                    # Gas price paid
+  success: Boolean!                   # Transaction success
+  errorMessage: String                # Error if failed
+  
+  # Relationships
+  relatedTransactions: [Transaction!]! @derivedFrom(field: "parentTransaction")
+  parentTransaction: Transaction       # Parent if part of larger operation
+}
+
+enum TransactionSource {
+  CONTRACT_EVENT    # From V5-style contract event handlers
+  TOKEN_TRANSFER    # From Blockscout tokentx endpoint  
+  INTERNAL_CALL     # From Blockscout txlistinternal
+  SYSTEM_LOG        # From Blockscout getLogs
+}
+
+enum TransactionCategory {
+  # Protocol operations (V5 preserved)
+  MINT, BURN, TRANSFER, APPROVAL,
+  TROVE_OPERATION, LIQUIDATION, REDEMPTION,
+  STABILITY_OPERATION, STAKING_OPERATION,
+  
+  # Ecosystem operations (Blockscout added)
+  DEX_SWAP, DEX_LIQUIDITY, BRIDGE_TRANSFER,
+  P2P_TRANSFER, PROTOCOL_INTEGRATION, FLASH_LOAN,
+  ARBITRAGE, COMPLEX_DEFI, INSTITUTIONAL_OPERATION
+}
+
+enum EcosystemType {
+  PROTOCOL_NATIVE,     # Direct USDFC protocol interactions
+  DEX_ECOSYSTEM,       # DEX trading ecosystem
+  BRIDGE_ECOSYSTEM,    # Cross-chain bridges
+  DEFI_ECOSYSTEM,      # Other DeFi protocol integrations
+  P2P_ECOSYSTEM,       # Peer-to-peer transfers
+  INSTITUTIONAL_ECOSYSTEM # Institution-level operations
+}
+
+##################################################
+# ENHANCED ACCOUNT INTELLIGENCE - Complete User Profiles
+##################################################
+
+"""
+Enhanced Account - Complete USDFC ecosystem participant intelligence
+All V5 data preserved + complete ecosystem analytics
+"""
+type Account @entity {
+  # Core identity
+  id: Bytes!                          # Account address
+  
+  # Balance & basic metrics (V5 preserved + enhanced)
+  usdfcBalance: BigInt!               # Current USDFC balance
+  totalTransactionCount: BigInt!      # All transactions
+  totalVolumeIn: BigInt!              # Total inbound volume
+  totalVolumeOut: BigInt!             # Total outbound volume
+  netVolume: BigInt!                  # Net volume (in - out)
+  
+  # Time tracking (enhanced)
+  firstSeenBlock: BigInt!             # First appearance
+  firstSeenTimestamp: BigInt!         # First appearance timestamp
+  lastActiveBlock: BigInt!            # Most recent activity
+  lastActiveTimestamp: BigInt!        # Most recent activity timestamp
+  daysSinceFirstSeen: BigInt!         # Account age
+  daysSinceLastActive: BigInt!        # Days since last activity
+  
+  # Activity breakdown by source (new)
+  contractTransactionCount: BigInt!   # V5-style contract interactions
+  tokenTransferCount: BigInt!         # Token transfer operations
+  internalTransactionCount: BigInt!   # Internal protocol operations
+  systemLogCount: BigInt!             # System-level operations
+  
+  # Activity breakdown by category (new)
+  protocolOperationCount: BigInt!     # Protocol-native operations
+  dexActivityCount: BigInt!           # DEX trading operations
+  bridgeActivityCount: BigInt!        # Bridge operations
+  p2pTransferCount: BigInt!           # P2P transfers
+  defiIntegrationCount: BigInt!       # DeFi integration usage
+  
+  # Volume breakdown by ecosystem (new)
+  protocolVolume: BigInt!             # Volume from protocol operations
+  dexVolume: BigInt!                  # Volume from DEX trading
+  bridgeVolume: BigInt!               # Volume from bridge operations
+  p2pVolume: BigInt!                  # Volume from P2P transfers
+  defiIntegrationVolume: BigInt!      # Volume from DeFi integrations
+  
+  # V5 Protocol participation (preserved)
+  trove: Trove                        # CDP position
+  stabilityDeposit: StabilityDeposit  # Stability pool position
+  protocolStake: ProtocolStake        # Protocol token stake
+  
+  # Ecosystem participation (new)
+  dexProfile: DEXProfile              # DEX trading profile
+  bridgeProfile: BridgeProfile        # Cross-chain activity profile
+  defiProfile: DeFiProfile            # DeFi integration profile
+  institutionalProfile: InstitutionalProfile # Institution classification
+  
+  # User intelligence & analytics (new)
+  userType: UserType!                 # Primary classification
+  activityPatterns: [ActivityPattern!]! # Activity pattern analysis
+  riskScore: BigDecimal!              # Risk assessment
+  composabilityScore: BigDecimal!     # Cross-protocol activity score
+  influenceScore: BigDecimal!         # Ecosystem influence
+  retentionScore: BigDecimal!         # User retention likelihood
+  
+  # Relationships (enhanced)
+  allTransactions: [Transaction!]! @derivedFrom(field: "from")
+  receivedTransactions: [Transaction!]! @derivedFrom(field: "to")
+  protocolOperations: [ProtocolOperation!]! @derivedFrom(field: "account")
+  ecosystemOperations: [EcosystemOperation!]! @derivedFrom(field: "account")
+}
+
+enum UserType {
+  RETAIL_USER,           # Individual retail participant
+  POWER_USER,            # High-activity retail user
+  DEX_TRADER,            # Primary DEX trading activity
+  DEFI_USER,             # Multi-protocol DeFi participant
+  BRIDGE_USER,           # Cross-chain activity focus
+  INSTITUTIONAL_USER,    # Institution or high-value account
+  PROTOCOL_NATIVE,       # Primarily USDFC protocol
+  ECOSYSTEM_NATIVE       # Primarily USDFC ecosystem
+}
+
+##################################################
+# ENHANCED PROTOCOL LAYER - V5 Data Improved & Restructured
+##################################################
+
+"""
+Enhanced Trove - V5 CDP data with advanced risk analytics
+"""
+type Trove @entity {
+  # Core identity (V5 preserved)
+  id: Bytes!                          # Trove ID (owner address)
+  owner: Account!                     # Trove owner
+  
+  # Current state (V5 preserved + enhanced)
+  status: TroveStatus!                # Current status
+  collateral: BigInt!                 # Current collateral (FIL)
+  debt: BigInt!                       # Current debt (USDFC)
+  stake: BigInt!                      # Current stake
+  collateralRatio: BigDecimal!        # Current collateral ratio
+  
+  # Enhanced risk analytics (new)
+  healthScore: BigDecimal!            # Overall health (0-100)
+  riskLevel: RiskLevel!               # Risk classification
+  liquidationPrice: BigDecimal!       # Liquidation trigger price
+  safetyMargin: BigDecimal!           # Distance from liquidation
+  
+  # Lifecycle tracking (V5 enhanced)
+  openedAtBlock: BigInt!              # Opening block
+  openedAtTimestamp: BigInt!          # Opening timestamp
+  lastUpdateBlock: BigInt!            # Last update block
+  lastUpdateTimestamp: BigInt!        # Last update timestamp
+  closedAtBlock: BigInt               # Closing block (if closed)
+  closedAtTimestamp: BigInt           # Closing timestamp (if closed)
+  daysOpen: BigInt!                   # Days since opening
+  
+  # Lifetime metrics (V5 enhanced)
+  totalBorrowed: BigInt!              # Lifetime borrowed
+  totalRepaid: BigInt!                # Lifetime repaid
+  totalCollateralAdded: BigInt!       # Lifetime collateral added
+  totalCollateralWithdrawn: BigInt!   # Lifetime collateral withdrawn
+  borrowingFeesPaid: BigInt!          # Total borrowing fees
+  operationCount: BigInt!             # Total operations
+  
+  # Performance analytics (new)
+  averageCollateralRatio: BigDecimal! # Average CR over lifetime
+  lowestCollateralRatio: BigDecimal!  # Lowest CR reached
+  riskEvents: BigInt!                 # Times at risk
+  performanceScore: BigDecimal!       # Overall performance
+  
+  # Predictive analytics (new)
+  liquidationRiskScore: BigDecimal!   # ML liquidation risk
+  optimizationSuggestions: [String!]! # Performance recommendations
+  
+  # Relationships (enhanced)
+  operations: [TroveOperation!]! @derivedFrom(field: "trove")
+  liquidation: Liquidation            # Liquidation event
+  redemptions: [RedemptionImpact!]! @derivedFrom(field: "trove")
+}
+
+enum TroveStatus {
+  ACTIVE,
+  CLOSED_BY_OWNER,
+  CLOSED_BY_LIQUIDATION,
+  CLOSED_BY_REDEMPTION
+}
+
+enum RiskLevel {
+  VERY_LOW,    # >200% collateral ratio
+  LOW,         # 150-200% ratio
+  MEDIUM,      # 125-150% ratio
+  HIGH,        # 110-125% ratio
+  VERY_HIGH,   # 105-110% ratio
+  CRITICAL     # Below 105% ratio
+}
+
+"""
+Enhanced Transfer - V5 Transfer with ecosystem intelligence
+"""
+type Transfer @entity(immutable: true) {
+  # V5 fields (preserved)
+  id: Bytes!
+  timestamp: BigInt!
+  from: Account!
+  to: Account!
+  value: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  transferType: TransferType!
+  relatedOperation: Bytes
+  
+  # Universal transaction link
+  universalTransaction: Transaction!  # Link to universal record
+  
+  # Enhanced context (new)
+  ecosystemType: EcosystemType!       # Which ecosystem
+  composabilityLinks: [ComposabilityLink!]! # Cross-protocol relationships
+  riskScore: BigDecimal!              # Transfer risk score
+  
+  # Raw format for composability
+  rawTransferData: Bytes!             # Complete context
+  extendedContext: TransferContext    # Additional metadata
+}
+
+enum TransferType {
+  NORMAL,
+  MINT_TO_BORROWER,
+  BURN_FROM_REPAYMENT,
+  LIQUIDATION_REWARD,
+  REDEMPTION_PAYMENT,
+  STABILITY_DEPOSIT,
+  STABILITY_WITHDRAWAL,
+  STAKING_OPERATION,
+  # New ecosystem types
+  DEX_SWAP_IN,
+  DEX_SWAP_OUT,
+  BRIDGE_DEPOSIT,
+  BRIDGE_WITHDRAWAL,
+  P2P_DIRECT,
+  FLASH_LOAN_BORROW,
+  FLASH_LOAN_REPAY
+}
+
+##################################################
+# ECOSYSTEM INTELLIGENCE LAYER - New Capabilities
+##################################################
+
+"""
+DEX Profile - User's DEX trading intelligence
+"""
+type DEXProfile @entity {
+  id: Bytes!                          # Account address
+  account: Account!                   # Associated account
+  
+  # Trading metrics
+  totalTrades: BigInt!                # Total DEX trades
+  totalVolume: BigInt!                # Total trading volume
+  totalFees: BigInt!                  # Total fees paid
+  
+  # Performance metrics
+  profitableTrades: BigInt!           # Winning trades
+  unprofitableTrades: BigInt!         # Losing trades
+  averageTradeSize: BigDecimal!       # Average trade size
+  largestTrade: BigInt!               # Largest trade
+  
+  # Advanced analytics
+  tradingSuccessRate: BigDecimal!     # Win rate %
+  totalProfitLoss: BigInt!            # Net P&L
+  sharpeRatio: BigDecimal!            # Risk-adjusted returns
+  maxDrawdown: BigDecimal!            # Max loss period
+  
+  # Behavioral patterns
+  tradingFrequency: TradingFrequency! # Trading frequency
+  preferredDEXs: [String!]!           # Favorite DEX protocols
+  tradingHours: [Int!]!               # Preferred hours (0-23)
+  riskTolerance: RiskTolerance!       # Risk profile
+  
+  # Relationships  
+  trades: [DEXTrade!]! @derivedFrom(field: "dexProfile")
+}
+
+"""
+DEX Trade - Individual DEX trading operation
+"""
+type DEXTrade @entity(immutable: true) {
+  id: Bytes!                          # Trade ID
+  transaction: Transaction!           # Universal transaction
+  trader: Account!                    # Trader account
+  dexProfile: DEXProfile              # DEX profile relationship
+
+  # Trade details
+  dexProtocol: String!                # DEX protocol used
+  tradeType: DEXTradeType!            # Type of trade
+  inputToken: Bytes!                  # Input token
+  outputToken: Bytes!                 # Output token
+  inputAmount: BigInt!                # Input amount
+  outputAmount: BigInt!               # Output amount
+
+  # USD Values (GeckoTerminal Enhancement)
+  inputAmountUSD: BigDecimal!         # Input value in USD
+  outputAmountUSD: BigDecimal!        # Output value in USD
+  volumeUSD: BigDecimal!              # Total trade volume USD
+
+  # Pricing & performance
+  price: BigDecimal!                  # Execution price
+  slippage: BigDecimal!               # Slippage %
+  fee: BigInt!                        # Fee paid
+  feePercentage: BigDecimal!          # Fee %
+
+  # Price Context (GeckoTerminal Enhancement)
+  baseTokenPriceUSD: BigDecimal!      # Base token price at trade
+  quoteTokenPriceUSD: BigDecimal!     # Quote token price at trade
+  poolReserveUSD: BigDecimal!         # Pool TVL at trade time
+
+  # Analytics
+  profitLoss: BigInt!                 # P&L on trade
+  priceImpact: BigDecimal!            # Price impact %
+  executionQuality: BigDecimal!       # Execution quality score
+
+  # Pool Context (GeckoTerminal Enhancement)
+  poolAddress: Bytes!                 # Pool contract address
+  poolFeeTier: BigInt!                # Fee tier (500 = 0.05%)
+
+  # Context
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  gasUsed: BigInt!
+}
+
+enum DEXTradeType {
+  BUY,                 # Buy USDFC (GeckoTerminal Enhancement)
+  SELL,                # Sell USDFC (GeckoTerminal Enhancement)
+  EXACT_INPUT_SINGLE,
+  EXACT_INPUT_MULTI,
+  EXACT_OUTPUT_SINGLE,
+  EXACT_OUTPUT_MULTI,
+  LIQUIDITY_ADD,
+  LIQUIDITY_REMOVE
+}
+
+enum TradingFrequency {
+  INACTIVE,      # No recent trades
+  OCCASIONAL,    # < 1 per week
+  REGULAR,       # 1-5 per week
+  ACTIVE,        # 5-20 per week
+  VERY_ACTIVE,   # 20+ per week
+  HIGH_FREQUENCY # Multiple per day
+}
+
+enum RiskTolerance {
+  VERY_LOW,
+  LOW,
+  MEDIUM,
+  HIGH,
+  VERY_HIGH
+}
+
+"""
+Composability Activity - Cross-protocol operations
+"""
+type ComposabilityActivity @entity(immutable: true) {
+  id: Bytes!
+  account: Account!
+  timestamp: BigInt!
+  
+  # Cross-protocol details
+  protocols: [Bytes!]!                # All protocols involved
+  protocolNames: [String!]!           # Protocol identifiers
+  operationType: ComposabilityType!   # Operation type
+  totalValue: BigInt!                 # Total value
+  
+  # Complexity metrics
+  composabilityDepth: Int!            # Number of protocols
+  innovationScore: BigDecimal!        # Innovation score
+  complexityScore: BigDecimal!        # Technical complexity
+  efficiencyScore: BigDecimal!        # Efficiency score
+  
+  # Value flow
+  valueFlowSteps: [ValueFlowStep!]!   # Step-by-step flow
+  arbitrageValue: BigDecimal          # Arbitrage captured
+  
+  # Risk assessment
+  riskScore: BigDecimal!              # Composition risk
+  liquidityRisk: BigDecimal!          # Liquidity risk
+  technicalRisk: BigDecimal!          # Technical risk
+  
+  # Raw composability data
+  rawComposabilityData: Bytes!        # Complete context
+  
+  # Relationships
+  relatedTransactions: [Transaction!]! # All related transactions
+}
+
+enum ComposabilityType {
+  SIMPLE_TRANSFER,
+  MULTI_HOP_SWAP,
+  CROSS_CHAIN_BRIDGE,
+  PROTOCOL_COMPOSITION,
+  INSTITUTIONAL_FLOW,
+  ARBITRAGE_COMPLEX,
+  NOVEL_COMPOSITION
+}
+
+"""
+Value Flow Step - Individual step in complex operations
+"""
+type ValueFlowStep @entity(immutable: true) {
+  id: Bytes!
+  composabilityActivity: ComposabilityActivity!
+  sequence: Int!                      # Step order
+  
+  # Flow details
+  fromProtocol: Bytes!                # Source protocol
+  toProtocol: Bytes!                  # Destination protocol
+  value: BigInt!                      # Value in step
+  operation: String!                  # Operation type
+  
+  # Context
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  
+  # Analytics
+  stepEfficiency: BigDecimal!         # Step efficiency
+  stepRisk: BigDecimal!               # Step risk
+  
+  # Raw data
+  rawStepData: Bytes!                 # Complete context
+}
+
+##################################################
+# ENHANCED ANALYTICS & INTELLIGENCE
+##################################################
+
+"""
+Enhanced Protocol Stats - V5 data + complete ecosystem metrics
+"""
+type ProtocolStats @entity {
+  id: ID!                             # "global"
+  
+  # V5 core metrics (preserved)
+  totalSupply: BigInt!                # Total USDFC supply
+  totalDebt: BigInt!                  # Total protocol debt
+  totalCollateral: BigInt!            # Total collateral locked
+  activeTroveCount: BigInt!           # Active CDPs
+  totalTroveCount: BigInt!            # Total CDPs ever
+  holderCount: BigInt!                # USDFC holders
+  
+  # Enhanced protocol metrics (new)
+  averageCollateralRatio: BigDecimal! # Average CR
+  medianCollateralRatio: BigDecimal!  # Median CR
+  protocolHealth: BigDecimal!         # Protocol health
+  liquidationRisk: BigDecimal!        # Systemic risk
+  
+  # Complete ecosystem metrics (new)
+  ecosystemUserCount: BigInt!         # All participants
+  dexTradingVolume: BigInt!           # DEX volume
+  bridgeVolume: BigInt!               # Bridge volume
+  p2pVolume: BigInt!                  # P2P volume
+  defiIntegrationVolume: BigInt!      # DeFi volume
+  totalEcosystemVolume: BigInt!       # Total volume
+  
+  # Activity metrics (enhanced)
+  dailyActiveUsers: BigInt!           # DAU
+  weeklyActiveUsers: BigInt!          # WAU
+  monthlyActiveUsers: BigInt!         # MAU
+  userRetentionRate: BigDecimal!      # Retention %
+  userAcquisitionRate: BigDecimal!    # Acquisition %
+  
+  # Composability metrics (new)
+  protocolIntegrations: BigInt!       # Integration count
+  crossProtocolOperations: BigInt!    # Cross-protocol ops
+  composabilityScore: BigDecimal!     # Composability index
+  innovationIndex: BigDecimal!        # Innovation index
+  
+  # Predictive metrics (new)
+  predictedGrowth: BigDecimal!        # Growth prediction
+  ecosystemHealthScore: BigDecimal!   # Ecosystem health
+  
+  # Update tracking
+  lastUpdateBlock: BigInt!
+  lastUpdateTimestamp: BigInt!
+}
+
+"""
+Daily Ecosystem Stats - Complete daily analytics
+"""
+type DailyEcosystemStats @entity {
+  id: ID!                             # "YYYY-MM-DD"
+  date: String!                       # Date string
+  timestamp: BigInt!                  # Day timestamp
+  
+  # V5 metrics (preserved)
+  protocolTransferCount: BigInt!      # Protocol transfers
+  protocolTransferVolume: BigInt!     # Protocol volume
+  protocolActiveUsers: BigInt!        # Protocol users
+  
+  # Ecosystem metrics (new)
+  dexTradeCount: BigInt!              # DEX trades
+  dexTradeVolume: BigInt!             # DEX volume
+  dexActiveUsers: BigInt!             # DEX users
+  bridgeOperationCount: BigInt!       # Bridge ops
+  bridgeVolume: BigInt!               # Bridge volume
+  bridgeActiveUsers: BigInt!          # Bridge users
+  p2pTransferCount: BigInt!           # P2P transfers
+  p2pTransferVolume: BigInt!          # P2P volume
+  p2pActiveUsers: BigInt!             # P2P users
+  
+  # Combined metrics (new)
+  totalEcosystemTransactionCount: BigInt! # All transactions
+  totalEcosystemVolume: BigInt!       # All volume
+  totalActiveUsers: BigInt!           # All users
+  newUsers: BigInt!                   # New users
+  returningUsers: BigInt!             # Returning users
+  
+  # Advanced metrics (new)
+  averageTransactionSize: BigDecimal! # Avg tx size
+  medianTransactionSize: BigInt!      # Median tx size
+  uniqueTransactionTypes: BigInt!     # Different ops
+  composabilityScore: BigDecimal!     # Daily composability
+  
+  # Growth metrics (new)
+  userGrowthRate: BigDecimal!         # User growth %
+  volumeGrowthRate: BigDecimal!       # Volume growth %
+  activityGrowthRate: BigDecimal!     # Activity growth %
+}
+
+##################################################
+# REMAINING V5 ENTITIES (Enhanced)
+##################################################
+
+# StabilityDeposit, ProtocolStake, TroveOperation, Liquidation, etc.
+# All preserved with enhancements for ecosystem intelligence
+
+"""
+Enhanced Stability Deposit - V5 data with yield analytics
+"""
+type StabilityDeposit @entity {
+  id: Bytes!                          # Depositor address
+  depositor: Account!                 # Depositor account
+  
+  # Current state (V5 preserved)
+  currentDeposit: BigInt!             # Current deposit
+  
+  # Lifetime metrics (V5 enhanced)
+  totalDeposited: BigInt!             # Total deposited
+  totalWithdrawn: BigInt!             # Total withdrawn
+  totalCollateralGained: BigInt!      # Collateral gained
+  totalProtocolTokenGained: BigInt!   # Protocol tokens gained
+  
+  # Performance analytics (new)
+  averageDeposit: BigDecimal!         # Average deposit size
+  yieldRate: BigDecimal!              # Yield rate %
+  performanceScore: BigDecimal!       # Performance score
+  riskScore: BigDecimal!              # Risk score
+  
+  # Time tracking
+  firstDepositAt: BigInt!
+  lastActivityAt: BigInt!
+  daysActive: BigInt!
+  
+  # Relationships
+  operations: [StabilityOperation!]! @derivedFrom(field: "deposit")
+}
+
+##################################################
+# SUPPORTING TYPES
+##################################################
+
+type ProtocolContext @entity {
+  id: Bytes!
+  operationType: String!
+  relatedTrove: Trove
+  relatedDeposit: StabilityDeposit
+  relatedStake: ProtocolStake
+}
+
+type EcosystemContext @entity {
+  id: Bytes!
+  dexTrade: DEXTrade
+  bridgeOperation: BridgeOperation
+  p2pTransfer: P2PTransfer
+  protocolIntegration: ProtocolIntegration
+}
+
+type ComposabilityLink @entity {
+  id: Bytes!
+  relatedTransaction: Transaction!
+  linkType: String!
+  linkStrength: BigDecimal!
+}
+
+type TransferContext @entity {
+  id: Bytes!
+  additionalMetadata: Bytes
+  contextType: String!
+}
+
+type ActivityPattern @entity {
+  id: Bytes!
+  account: Account!
+  patternType: String!
+  frequency: String!
+  timePreferences: [Int!]!
+  valuePatterns: [BigInt!]!
+}
+
+# Additional supporting entities...
+type BridgeProfile @entity {
+  id: Bytes!
+  account: Bytes!
+  totalBridgeOperations: BigInt!
+  totalBridgeVolume: BigInt!
+  uniqueChainsInteracted: Int!
+  firstBridgeTimestamp: BigInt!
+  lastBridgeTimestamp: BigInt
+  preferredBridge: String
+  averageBridgeSize: BigDecimal!
+  bridgeFrequency: BigDecimal!
+  crossChainComposability: BigDecimal!
+}
+
+type DeFiProfile @entity {
+  id: Bytes!
+  # DeFi integration profile
+}
+
+type InstitutionalProfile @entity {
+  id: Bytes!
+  # Institutional classification
+}
+
+type BridgeOperation @entity {
+  id: Bytes!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  sender: String!
+  bridge: String!  # "Axelar", "Celer", etc.
+  sourceChain: String!
+  destinationChain: String!
+  destinationAddress: String!
+  status: String!  # "Initiated", "Approved", "Executed", "Sent"
+  hash: String
+  sourceTxHash: String
+  tokenSymbol: String
+  amount: BigInt
+}
+
+type P2PTransfer @entity {
+  id: Bytes!
+  # P2P transfer details
+}
+
+type ProtocolIntegration @entity {
+  id: Bytes!
+  # Protocol integration details
+}
+
+# V5 entities preserved (enhanced)
+type TroveOperation @entity(immutable: true) {
+  id: Bytes!
+  timestamp: BigInt!
+  trove: Trove!
+  operation: String!
+  collateralChange: BigInt!
+  debtChange: BigInt!
+  collateralBefore: BigInt!
+  collateralAfter: BigInt!
+  debtBefore: BigInt!
+  debtAfter: BigInt!
+  borrowingFee: BigInt
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Liquidation @entity(immutable: true) {
+  id: Bytes!
+  timestamp: BigInt!
+  trove: Trove
+  borrower: Account
+  collateralLiquidated: BigInt!
+  debtLiquidated: BigInt!
+  collateralGasCompensation: BigInt!
+  debtGasCompensation: BigInt!
+  collateralSurplus: BigInt
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type StabilityOperation @entity(immutable: true) {
+  id: Bytes!
+  timestamp: BigInt!
+  deposit: StabilityDeposit!
+  operation: String!
+  amount: BigInt!
+  collateralGainClaimed: BigInt!
+  protocolTokenClaimed: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProtocolStake @entity {
+  id: Bytes!
+  # V5 fields preserved + enhancements
+}
+
+type RedemptionImpact @entity {
+  id: Bytes!
+  trove: Trove!
+  # Redemption impact details
+}
+
+type ProtocolOperation @entity {
+  id: Bytes!
+  account: Account!
+  # Protocol operation details
+}
+
+type EcosystemOperation @entity {
+  id: Bytes!
+  account: Account!
+  # Ecosystem operation details
+}
+
+"""
+Enhanced Protocol Stats - V5 data + complete ecosystem metrics
+"""
+type EcosystemStats @entity {
+  id: ID!                             # "global"
+  
+  # Complete ecosystem metrics
+  ecosystemUserCount: BigInt!         # All ecosystem participants
+  dexTradingVolume: BigInt!           # DEX ecosystem volume
+  bridgeVolume: BigInt!               # Cross-chain volume
+  p2pVolume: BigInt!                  # P2P transfer volume
+  defiIntegrationVolume: BigInt!      # DeFi integration volume
+  totalEcosystemVolume: BigInt!       # Complete ecosystem volume
+  
+  # Activity metrics
+  dailyActiveUsers: BigInt!           # Daily active users
+  weeklyActiveUsers: BigInt!          # Weekly active users
+  monthlyActiveUsers: BigInt!         # Monthly active users
+  userRetentionRate: BigDecimal!      # User retention %
+  userAcquisitionRate: BigDecimal!    # User acquisition rate
+  
+  # Composability metrics
+  protocolIntegrations: BigInt!       # Number of protocol integrations
+  crossProtocolOperations: BigInt!    # Cross-protocol operations
+  composabilityScore: BigDecimal!     # Overall composability metric
+  innovationIndex: BigDecimal!        # Innovation/novelty index
+  
+  # Predictive metrics
+  predictedGrowth: BigDecimal!        # ML-based growth prediction
+  ecosystemHealthScore: BigDecimal!   # Overall ecosystem health
+  
+  # Update tracking
+  lastUpdateBlock: BigInt!
+  lastUpdateTimestamp: BigInt!
+}
+
+"""
+Pool Metrics - Aggregated pool-level analytics (GeckoTerminal Enhancement)
+"""
+type PoolMetrics @entity {
+  id: Bytes!                          # Pool address
+
+  # Pool Identity
+  poolAddress: Bytes!                 # Pool contract
+  baseToken: Bytes!                   # Base token (USDFC)
+  quoteToken: Bytes!                  # Quote token (WFIL/axlUSDC)
+  feeTier: BigInt!                    # Fee tier (500 = 0.05%, 3000 = 0.3%)
+  dexProtocol: String!                # "SushiSwap V3"
+  createdAt: BigInt!                  # Pool creation timestamp
+  createdAtBlock: BigInt!             # Pool creation block
+
+  # Current State
+  baseTokenPriceUSD: BigDecimal!      # Current base price USD
+  quoteTokenPriceUSD: BigDecimal!     # Current quote price USD
+  reserveUSD: BigDecimal!             # Total value locked (TVL)
+  baseTokenReserve: BigInt!           # Base token amount
+  quoteTokenReserve: BigInt!          # Quote token amount
+
+  # Volume Metrics
+  volume24hUSD: BigDecimal!           # 24h trading volume USD
+  volume7dUSD: BigDecimal!            # 7d trading volume USD
+  volumeAllTimeUSD: BigDecimal!       # All-time volume USD
+
+  # Transaction Metrics
+  txCount24h: BigInt!                 # 24h transaction count
+  txCount7d: BigInt!                  # 7d transaction count
+  txCountAllTime: BigInt!             # All-time transactions
+
+  # Buy/Sell Analytics
+  buys24h: BigInt!                    # 24h buy count
+  sells24h: BigInt!                   # 24h sell count
+  uniqueBuyers24h: Int!               # 24h unique buyers
+  uniqueSellers24h: Int!              # 24h unique sellers
+
+  # Price Changes
+  priceChange1h: BigDecimal!          # 1h price change %
+  priceChange6h: BigDecimal!          # 6h price change %
+  priceChange24h: BigDecimal!         # 24h price change %
+
+  # Timestamps
+  lastUpdateTimestamp: BigInt!        # Last metrics update
+  lastUpdateBlock: BigInt!            # Last update block
+}

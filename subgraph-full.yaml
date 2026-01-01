@@ -1,0 +1,185 @@
+specVersion: 0.0.5
+description: USDFC v0 - Universal Ecosystem Analytics with Blockscout Efficiency
+repository: https://github.com/usdfc/usdfc-subgraph-v0
+schema:
+  file: ./schema.graphql
+
+features:
+  - nonFatalErrors
+  - grafting
+  - ipfsOnEthereumContracts
+
+# Goldsky optimization hints  
+indexerHints:
+  prune: auto
+
+# Efficient grafting using Blockscout extracted blocks
+graft:
+  base: "QmPreviousDeploymentHash"   # Previous deployment (if any)
+  block: 4900000                    # Start of efficient historical data
+
+##################################################
+# DATA SOURCES - V0 Enhanced Multi-Source Architecture
+##################################################
+
+dataSources:
+  ##################################################
+  # USDFC TOKEN - Enhanced with Ecosystem Intelligence
+  ##################################################
+  - kind: ethereum
+    name: USDFC_V0_Enhanced
+    network: filecoin
+    source:
+      address: "0x80B98d3aa09ffff255c3ba4A241111Ff1262F045"
+      abi: USDFC
+      startBlock: 4900000            # Efficient start block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - Transfer
+        - ProtocolStats
+        - EcosystemStats
+        - DailyEcosystemStats
+      abis:
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer      # Enhanced with ecosystem classification
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval      # Enhanced with relationship tracking
+        - event: Mint(indexed address,uint256)
+          handler: handleMint          # Enhanced with context analysis
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn          # Enhanced with context analysis
+      file: ./src/protocol/usdfc-token-final.ts
+
+  ##################################################  
+  # TROVE MANAGER - Enhanced with Risk Analytics
+  # TEMPORARILY DISABLED FOR MVP DEPLOYMENT
+  ##################################################
+  # - kind: ethereum
+  #   name: TroveManager_V0_Enhanced
+  #   network: filecoin
+  #   source:
+  #     address: "0x5aB87c2398454125Dd424425e39c8909bBE16022"
+  #     abi: TroveManager
+  #     startBlock: 4900000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - Trove
+        - TroveOperation
+        - Liquidation
+        - ProtocolStats
+      abis:
+        - name: TroveManager
+          file: ./abis/TroveManager.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
+          handler: handleTroveUpdated   # Enhanced with risk analytics
+        - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
+          handler: handleTroveLiquidated # Enhanced with impact analysis
+        - event: Liquidation(uint256,uint256,uint256,uint256)
+          handler: handleLiquidation    # Enhanced with ecosystem impact
+        - event: Redemption(uint256,uint256,uint256,uint256)
+          handler: handleRedemption     # Enhanced with market analysis
+      file: ./src/protocol/trove-manager.ts
+
+  ##################################################
+  # STABILITY POOL - Enhanced with Yield Analytics
+  ##################################################
+  - kind: ethereum
+    name: StabilityPool_V0_Enhanced
+    network: filecoin
+    source:
+      address: "0x791Ad78bBc58324089D3E0A8689E7D045B9592b5"
+      abi: StabilityPool
+      startBlock: 4900000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - StabilityDeposit
+        - StabilityOperation
+        - ProtocolStats
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+      eventHandlers:
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged # Enhanced with yield tracking
+        - event: FILGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleFILGainWithdrawn   # Enhanced with performance metrics
+      file: ./src/protocol/stability-pool.ts
+
+  ##################################################
+  # PROTOCOL TOKEN STAKING - Enhanced with Rewards Analytics
+  ##################################################
+  - kind: ethereum
+    name: ProtocolTokenStaking_V0_Enhanced
+    network: filecoin
+    source:
+      address: "0xc8707b3d426E7D7A0706C48dcd1A4b83bc220dB3"
+      abi: ProtocolTokenStaking
+      startBlock: 4900000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - ProtocolStake
+        - StakeOperation
+        - ProtocolStats
+      abis:
+        - name: ProtocolTokenStaking
+          file: ./abis/ProtocolTokenStaking.json
+      eventHandlers:
+        - event: StakeChanged(indexed address,uint256)
+          handler: handleStakeChanged       # Enhanced with strategy analysis
+        - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
+          handler: handleStakingGainsWithdrawn # Enhanced with yield optimization
+      file: ./src/protocol/staking.ts
+
+  ##################################################
+  # PRICE FEED - Enhanced with Market Analytics
+  ##################################################
+  - kind: ethereum
+    name: PriceFeed_V0_Enhanced
+    network: filecoin
+    source:
+      address: "0x80e651c9739C1ed15A267c11b85361780164A368"
+      abi: PriceFeed
+      startBlock: 4900000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - PriceUpdate
+        - MarketCondition
+        - ProtocolStats
+      abis:
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+      eventHandlers:
+        - event: LastGoodPriceUpdated(uint256)
+          handler: handlePriceUpdate        # Enhanced with market impact analysis
+      file: ./src/protocol/price-feed.ts
+
+# Templates commented out for MVP deployment
+# Will be added in Phase 2 with ecosystem handlers

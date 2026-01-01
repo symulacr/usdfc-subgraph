@@ -1,0 +1,42 @@
+{
+  "name": "usdfc-subgraph-v7-ultimate",
+  "version": "7.0.0",
+  "description": "USDFC V7 Ultimate - V6 Blockscout Efficiency + V0 Ecosystem Intelligence",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usdfc/usdfc-subgraph-v7"
+  },
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.goldsky.com/api/public/project_cmj1jnhy32wne01te2dha018t/subgraphs/usdfc-v7-ultimate/v7/gn",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 usdfc/usdfc-v7",
+    "create-local": "graph create --node http://localhost:8020/ usdfc/usdfc-v7",
+    "remove-local": "graph remove --node http://localhost:8020/ usdfc/usdfc-v7",
+    "test": "graph test",
+    "test:coverage": "graph test --coverage",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:staging": "mustache config/staging.json subgraph.template.yaml > subgraph.yaml"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.68.4",
+    "@graphprotocol/graph-ts": "0.31.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "0.5.0",
+    "mustache": "^4.0.0"
+  },
+  "keywords": [
+    "usdfc",
+    "filecoin", 
+    "stablecoin",
+    "defi",
+    "subgraph",
+    "analytics",
+    "goldsky",
+    "blockscout",
+    "ecosystem"
+  ],
+  "author": "USDFC Team",
+  "license": "MIT"
+}

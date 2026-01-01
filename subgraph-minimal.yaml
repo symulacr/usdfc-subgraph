@@ -1,0 +1,46 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  ##################################################
+  # USDFC TOKEN ONLY - Minimal Test Deployment
+  ##################################################
+  - kind: ethereum
+    name: USDFC_V7_Ultimate
+    network: filecoin
+    source:
+      address: "0x80B98d3aa09ffff255c3ba4A241111Ff1262F045"
+      abi: USDFC
+      startBlock: 4807452  # V6 extracted first transaction block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - Transfer
+        - ProtocolStats
+        - EcosystemStats
+        - ProtocolContext
+        - EcosystemContext
+      abis:
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+      file: ./src/protocol/usdfc-token-final.ts
+
+##################################################
+# INDEXER HINTS - Goldsky Performance Optimization
+##################################################
+indexerHints:
+  prune: auto

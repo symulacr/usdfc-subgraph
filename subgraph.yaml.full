@@ -1,0 +1,215 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  ##################################################
+  # USDFC TOKEN - V7 Ultimate (V6 Efficiency + V0 Intelligence)
+  ##################################################
+  - kind: ethereum
+    name: USDFC_V7_Ultimate
+    network: filecoin
+    source:
+      address: "0x80B98d3aa09ffff255c3ba4A241111Ff1262F045"
+      abi: USDFC
+      startBlock: 4807452  # V6 extracted first transaction block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - Transfer
+        - ProtocolStats
+        - EcosystemStats
+        - ProtocolContext
+        - EcosystemContext
+      abis:
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+      file: ./src/protocol/usdfc-token-final.ts
+
+  ##################################################
+  # SUSHISWAP V3 - DEX TRADING INTEGRATION
+  ##################################################
+  # SushiXSwap V2 - Cross-chain swap router
+  - kind: ethereum
+    name: SushiXSwap_V2_Router1
+    network: filecoin
+    source:
+      address: "0x804b526e5bF4349819fe2Db65349d0825870F8Ee"
+      abi: SushiXSwapV2
+      startBlock: 4900000  # TODO: Query exact creation block from Blockscout
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DEXTrade
+        - DEXProfile
+        - Account
+        - Transaction
+      abis:
+        - name: SushiXSwapV2
+          file: ./abis/SushiXSwapV2.json
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: BridgeRequested(bytes32,indexed address,indexed bytes32,indexed uint256,uint256,address,address,bytes)
+          handler: handleBridgeRequested
+      file: ./src/ecosystem/sushiswap.ts
+
+  - kind: ethereum
+    name: SushiXSwap_V2_Router2
+    network: filecoin
+    source:
+      address: "0xd5607d184b1d6ecba94a07c217497fe9346010d9"
+      abi: SushiXSwapV2
+      startBlock: 4900000  # TODO: Query exact creation block from Blockscout
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DEXTrade
+        - DEXProfile
+        - Account
+        - Transaction
+      abis:
+        - name: SushiXSwapV2
+          file: ./abis/SushiXSwapV2.json
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: BridgeRequested(bytes32,indexed address,indexed bytes32,indexed uint256,uint256,address,address,bytes)
+          handler: handleBridgeRequested
+      file: ./src/ecosystem/sushiswap.ts
+
+  # SushiSwap V3 Pool: USDFC/axlUSDC (33.5M USDFC + 11.1M axlUSDC)
+  - kind: ethereum
+    name: SushiSwap_Pool_USDFC_axlUSDC
+    network: filecoin
+    source:
+      address: "0x21ca72fe39095db9642ca9cc694fa056f906037f"
+      abi: UniswapV3Pool
+      startBlock: 4819399
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DEXTrade
+        - DEXProfile
+        - Account
+        - Transaction
+      abis:
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn
+      file: ./src/ecosystem/sushiswap.ts
+
+  # SushiSwap V3 Pool: USDFC/WFIL (33.5M USDFC + 82.8M WFIL)
+  - kind: ethereum
+    name: SushiSwap_Pool_USDFC_WFIL
+    network: filecoin
+    source:
+      address: "0x4e07447bd38e60b94176764133788be1a0736b30"
+      abi: UniswapV3Pool
+      startBlock: 5245708
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DEXTrade
+        - DEXProfile
+        - Account
+        - Transaction
+      abis:
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn
+      file: ./src/ecosystem/sushiswap.ts
+
+  ##################################################
+  # ECOSYSTEM MONITORING VIA USDFC TRANSFERS
+  ##################################################
+  # Track all USDFC transfers to detect ecosystem usage patterns
+  # This will capture: DEX, Lending, Bridges, Storage Payments, etc.
+  # Handlers will classify transfers based on recipient contracts
+
+  ##################################################
+  # AXELAR BRIDGE - Cross-Chain USDFC Transfers
+  ##################################################
+  - kind: ethereum
+    name: Axelar_Gateway
+    network: filecoin
+    source:
+      address: "0xe432150cce91c13a887f7D836923d5597adD8E31"  # AxelarGatewayProxy
+      abi: AxelarGateway
+      startBlock: 4807452  # Start from USDFC deployment (no point tracking Axelar before USDFC exists)
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BridgeOperation
+        - BridgeProfile
+        - Account
+        - Transaction
+        - EcosystemStats
+      abis:
+        - name: AxelarGateway
+          file: ./abis/AxelarGateway.json
+        - name: USDFC
+          file: ./abis/USDFC.json
+      eventHandlers:
+        - event: ContractCall(indexed address,string,string,indexed bytes32,bytes)
+          handler: handleContractCall
+        - event: ContractCallWithToken(indexed address,string,string,indexed bytes32,bytes,string,uint256)
+          handler: handleContractCallWithToken
+        - event: ContractCallApproved(indexed bytes32,string,string,indexed address,indexed bytes32,bytes32,uint256)
+          handler: handleContractCallApproved
+        - event: ContractCallExecuted(indexed bytes32)
+          handler: handleContractCallExecuted
+        - event: TokenSent(indexed address,string,string,string,uint256)
+          handler: handleTokenSent
+      file: ./src/ecosystem/bridges.ts
+
+  # NOTE: Additional integrations to be added:
+  # - Secured Finance Lending Pools (already integrated as USDFC Protocol)
+  # - Celer Bridge (no contracts found on Filecoin)
+  # - Lighthouse Storage Payments (contract discovery in progress)
+  # See: /V7_EFFICIENCY_COMPLETE.md
+
+##################################################
+# INDEXER HINTS - Goldsky Performance Optimization
+##################################################
+indexerHints:
+  prune: auto
