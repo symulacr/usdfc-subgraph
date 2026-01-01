@@ -93,6 +93,25 @@ npm run build
 | ProtocolTokenStaking | `0xc8707b3d426E7D7A0706C48dcd1A4b83bc220dB3` |
 | PriceFeed | `0xFc1EfC3b28cE1a72cDe1fd6A9C4B2E37d0A9c752` |
 
+## Deployment Timeline
+
+| Event | Block | Date |
+|-------|-------|------|
+| USDFC Token Deploy | 4,807,452 | March 21, 2025 |
+| First Transfer | 4,807,947 | March 21, 2025 |
+| SushiSwap USDFC/axlUSDC Pool | 4,819,399 | March 2025 |
+| First Trove Operation | 4,856,023 | March 2025 |
+| SushiSwap USDFC/WFIL Pool | 5,245,708 | April 2025 |
+| Current Sync | 5,630,948+ | December 2025 |
+
+## Version Endpoints
+
+| Version | Status | URL |
+|---------|--------|-----|
+| v5 | Production | https://api.goldsky.com/api/public/project_cmj1jnhy32wne01te2dha018t/subgraphs/usdfc/v5/gn |
+| v7 | Staging | https://api.goldsky.com/api/public/project_cmj1jnhy32wne01te2dha018t/subgraphs/usdfc/v7/gn |
+| v0 | Latest | https://api.goldsky.com/api/public/project_cmj1jnhy32wne01te2dha018t/subgraphs/usdfc/v0/gn |
+
 ## Known Issues (v5)
 
 Some entity fields require refinement:
